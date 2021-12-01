@@ -9,41 +9,62 @@ float speed = 2.3f;
 Texture2D playerImage = Raylib.LoadTexture("happy.png");
 Rectangle playerRect = new Rectangle(100, 70, playerImage.width, playerImage.height);
 
-Rectangle r1 = new Rectangle(200, 200, 50, 50);
-Rectangle r2 = new Rectangle(125, 225, 50, 50);
+Rectangle doorRect = new Rectangle(200, 200, 32, 32);
 
-Color r2Color = Color.DARKBROWN;
+string level = "start";
 
 while (!Raylib.WindowShouldClose())
 {
-  if (Raylib.IsKeyDown(KeyboardKey.KEY_W)) playerRect.y -= speed;
-  if (Raylib.IsKeyDown(KeyboardKey.KEY_S)) playerRect.y += speed;
-  if (Raylib.IsKeyDown(KeyboardKey.KEY_A)) playerRect.x -= speed;
-  if (Raylib.IsKeyDown(KeyboardKey.KEY_D)) playerRect.x += speed;
-
-  if (Raylib.CheckCollisionRecs(r1, r2))
+  if (level == "start" || level == "corridor")
   {
-    r2Color = Color.BEIGE;
-  }
-  else
-  {
-    r2Color = Color.RED;
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_W)) playerRect.y -= speed;
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_S)) playerRect.y += speed;
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_A)) playerRect.x -= speed;
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_D)) playerRect.x += speed;
   }
 
-  r2.x += 0.25f;
+  if (level == "start")
+  {
+    if (Raylib.CheckCollisionRecs(playerRect, doorRect))
+    {
+      level = "end";
+    }
+    if (playerRect.x > 800)
+    {
+      level = "corridor";
+      playerRect.x = 0;
+    }
+  }
+  else if (level == "corridor")
+  {
+    if (playerRect.x <0)
+    {
+      level = "start";
+      playerRect.x = 800 - playerRect.width;
+    }
+  }
 
-  
   Raylib.BeginDrawing();
 
-  Raylib.ClearBackground(Color.BLUE);
+  if (level == "start")
+  {
+    Raylib.ClearBackground(Color.BLUE);
+    Raylib.DrawRectangleRec(doorRect, Color.BLACK);
+  }
+  else if (level == "end")
+  {
+    Raylib.ClearBackground(Color.PINK);
+  }
+  else if (level == "corridor")
+  {
+    Raylib.ClearBackground(Color.YELLOW);
+  }
 
-  Raylib.DrawRectangleRec(r1, Color.GREEN);
-  Raylib.DrawRectangleRec(r2, r2Color);
+  if (level == "start" || level == "corridor")
+  {
+    Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
+  }
 
-
-  Raylib.DrawRectangleRec(playerRect, Color.LIME);
-
-  Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
 
   Raylib.EndDrawing();
 }
