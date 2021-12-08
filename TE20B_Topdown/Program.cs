@@ -20,19 +20,33 @@ int points = 0;
 Rectangle pointRect = new Rectangle(256, 64, 16, 16);
 bool pointTaken = false;
 
+bool undoX = false;
+bool undoY = false;
+Vector2 movement = new Vector2();
 
 string level = "start";
 
 while (!Raylib.WindowShouldClose())
 {
+  undoX = false;
+  undoY = false;
+
   if (level == "start" || level == "corridor")
   {
-    Vector2 movement = ReadMovement(speed);
+    movement = ReadMovement(speed);
 
     playerRect.x += movement.X;
-
-    
     playerRect.y += movement.Y;
+
+    if (playerRect.x < 0 || playerRect.x + playerRect.width > Raylib.GetScreenWidth())
+    {
+      undoX = true;
+    }
+    if (playerRect.y < 0 || playerRect.y + playerRect.height > Raylib.GetScreenHeight())
+    {
+      undoY = true;
+    }
+
 
 
   }
@@ -62,6 +76,9 @@ while (!Raylib.WindowShouldClose())
       playerRect.x = 800 - playerRect.width;
     }
   }
+
+  if (undoX == true) playerRect.x -= movement.X;
+  if (undoY == true) playerRect.y -= movement.Y;
 
   Raylib.BeginDrawing();
 
